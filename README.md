@@ -65,15 +65,15 @@ environment variables:
     env VAGRANT_APT_CACHE=http://<your ip address>:3142
 
 To put the virtual machines on ramdisk:
-Note a decent amount of RAM is needed for this, the VMs and host OS need
-to be able to run in whatever is left of your RAM. About 1.5 GB RAM are needed
-for each VM, so if three releases need testing, 4.5 GB of ramdisk for the
-VM disk images alone will be needed, plus about 1 GB for the host and VM RAM.
-Per this, a minimum of 6 GB RAM is needed to run this on three releases.
+
+About 1.5 GB RAM are needed for a VM's virtual disk, plus about 1 GB for the
+host and VM RAM. VMs are destroyed after each use, so the ramdisk space can be
+reused. To be entirely safe, 3 GB total RAM are recommended if you want to use
+this, to allow for some breathing room.
 
 1. Add this to /etc/fstab:
 
-        tmpfs /ramdisk tmpfs defaults,size=4500m,uid=ubuntu 0 0
+        tmpfs /ramdisk tmpfs defaults,size=2000m,uid=ubuntu 0 0
 
 2. Create /ramdisk:
 
