@@ -22,7 +22,7 @@ Usage instructions
         $ ssh-keygen -O source-address=your_external_ip_address
         (select no passphrase)
    then add .ssh/id_rsa.pub to [your launchpad authorized keys](https://launchpad.net/~/+editsshkeys)
-   
+
 6. As the tarmac-running user, or globally, do <code>bzr branch lp:some-project</code>, this is so that
    launchpad's ssh host keys are known to the user, otherwise an Invalid host key error will appear.
  
@@ -52,3 +52,41 @@ Now you're ready to start running tarmac.
 
         $ echo "/sbin/start tarmac-lander >/dev/null" | sudo tee /etc/cron.hourly/tarmac-lander
 
+Optional refinements
+====================
+
+To speed up frequent testing, use apt-cacher-ng to cache downloaded packages:
+
+    $ sudo apt-get install apt-cacher-ng
+
+Then add the following to /etc/init/tarmac-lander.conf, along with the other
+environment variables:
+
+    env VAGRANT_APT_CACHE=http://<your ip address>:3142
+
+To put the virtual machines on ramdisk:
+Note a decent amount of RAM is needed for this, the VMs and host OS need
+to be able to run in whatever is left of your RAM. About 1.5 GB RAM are needed
+for each VM, so if three releases need testing, 4.5 GB of ramdisk for the
+VM disk images alone will be needed, plus about 1 GB for the host and VM RAM.
+Per this, a minimum of 6 GB RAM is needed to run this on three releases.
+
+1. Add this to /etc/fstab:
+
+        tmpfs /ramdisk tmpfs defaults,size=4500m,uid=ubuntu 0 0
+
+2. Create /ramdisk:
+
+        $ mkdir /ramdisk
+
+3. Mount /ramdisk:
+
+        $ sudo mount -a
+
+5. Edit ~/.VirtualBox/VirtualBox.xml, look for SystemProperties and change 
+the defaultMachineFolder to something under /ramdisk:
+
+        <SystemProperties 
+        defaultMachineFolder="/ramdisk/vms" defaultHardDiskFormat="VDI" 
+        VRDEAuthLibrary="VBoxAuth" webServiceAuthLibrary="VBoxAuth" 
+        LogHistoryCount="3"/>
