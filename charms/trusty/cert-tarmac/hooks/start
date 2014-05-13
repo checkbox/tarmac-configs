@@ -1,0 +1,4 @@
+#!/bin/bash
+# When "starting" the tarmac service, just set it to auto-run
+# via cron every 10 minutes
+echo "*/10 * * * * root /sbin/start tarmac-lander >/dev/null" > /etc/cron.d/tarmac-lander

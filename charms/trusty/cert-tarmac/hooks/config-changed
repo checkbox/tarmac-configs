@@ -1,0 +1,38 @@
+#!/bin/sh
+TUSER=ubuntu
+TUSERHOME=/home/${TUSER}
+# config-changed occurs everytime a new configuration value is updated (juju set)
+set -e
+LAUNCHPAD_ID=$(config-get launchpad-id)
+LAUNCHPAD_CREDENTIALS=$(config-get launchpad-credentials)
+LAUNCHPAD_PUBLIC_KEY=$(config-get launchpad-public-key)
+LAUNCHPAD_PRIVATE_KEY=$(config-get launchpad-private-key)
+
+if [ -n "$LAUNCHPAD_PUBLIC_KEY" ]; then
+	mkdir -p ${TUSERHOME}/.ssh
+	juju-log "Setting public key for Launchpad to $LAUNCHPAD_PUBLIC_KEY"
+	echo "$LAUNCHPAD_PUBLIC_KEY" >${TUSERHOME}/.ssh/id_rsa.pub
+fi
+
+if [ -n "$LAUNCHPAD_PRIVATE_KEY" ]; then
+	mkdir -p ${TUSERHOME}/.ssh
+	juju-log "Setting private key for Launchpad to some gobbledygook"
+	echo "$LAUNCHPAD_PRIVATE_KEY" >${TUSERHOME}/.ssh/id_rsa
+	chmod 700 ${TUSERHOME}/.ssh/id_rsa
+	juju-log "Adding Launchpad host keys to known_hosts"
+	cp $CHARM_DIR/known_hosts ${TUSERHOME}/.ssh
+
+
+fi
+
+chown -R ${TUSER}:${TUSER} ${TUSERHOME}
+
+juju-log "Setting new launchpad credentials for tarmac"
+echo "$LAUNCHPAD_CREDENTIALS" >${TUSERHOME}/.config/tarmac/credentials
+
+if [ -n "$LAUNCHPAD_ID" ]; then
+	juju-log "Setting launchpad id to $LAUNCHPAD_ID"
+	sudo -u ${TUSER} -- bzr launchpad-login $LAUNCHPAD_ID
+fi
+
+

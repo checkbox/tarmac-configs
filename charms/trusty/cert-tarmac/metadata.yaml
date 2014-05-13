@@ -1,0 +1,12 @@
+name: cert-tarmac
+summary: Installs certification team tarmac.
+maintainer: Daniel Manrique <daniel.manrique@canonical.com>
+description: |
+  Certification team tarmac with per-commit testing using vagrant or lxc.
+  See https://github.com/checkbox/tarmac-configs
+categories:
+  - misc
+subordinate: false
+provides:
+  cert-tarmac-lander: 
+      interface: landing-strip 

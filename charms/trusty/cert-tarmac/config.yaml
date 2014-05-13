@@ -1,0 +1,14 @@
+options:
+  launchpad-id:
+    type: string
+    description: "Launchpad ID (username) under which to work."
+  launchpad-credentials:
+    description: "The oauth credentials for connecting to Launchapd. Use create_creds.py to generate the file."
+    type: string
+  launchpad-public-key: 
+    description: "The SSH public key to use to connect to Launchpad."
+    type: string
+  launchpad-private-key:
+    description: "The SSH private key to use to connect to Launchpad."
+    type: string
+
