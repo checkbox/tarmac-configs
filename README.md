@@ -83,10 +83,6 @@ this, to allow for some breathing room.
 
         $ sudo mount -a
 
-5. Edit ~/.VirtualBox/VirtualBox.xml, look for SystemProperties and change 
-the defaultMachineFolder to something under /ramdisk:
-
-        <SystemProperties 
-        defaultMachineFolder="/ramdisk/vms" defaultHardDiskFormat="VDI" 
-        VRDEAuthLibrary="VBoxAuth" webServiceAuthLibrary="VBoxAuth" 
-        LogHistoryCount="3"/>
+5. As the user that will run tarmac, ask virtualbox to keep VMs by default in
+   the ramdisk:
+        $ VBoxManage setproperty machinefolder /ramdisk/vms
