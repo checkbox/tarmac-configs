@@ -85,4 +85,5 @@ this, to allow for some breathing room.
 
 5. As the user that will run tarmac, ask virtualbox to keep VMs by default in
    the ramdisk:
+
         $ VBoxManage setproperty machinefolder /ramdisk/vms
