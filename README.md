@@ -1,6 +1,22 @@
 Usage instructions
 ==================
 
+
+Deploying with juju
+-------------------
+
+If you have access to a cloud environment, you can use [Juju][2] to automate
+this entire process. Have a look in the charms directory, a `README.md` file in
+there provides instructions to prepare the 3 items of required configuration
+and deploy tarmac in 4 steps.
+
+Manual deployment
+-----------------
+
+If your tarmac-running user is named "ubuntu" these instructions should
+work out-of-the-box. If you want it run by a different user, see
+"Running as a different (non-ubuntu) user".
+
 1. Get an Ubuntu 13.04 box
 2. Install a few packages and clone tarmac and the tarmac configs (this!):
 
@@ -12,9 +28,13 @@ Usage instructions
         $ git clone git://github.com/checkbox/tarmac.git ~/tarmac
         $ sudo cp ~/.config/tarmac/tarmac-lander.conf /etc/init
 
+3. Create a directory to cache branches:
+
+        $ sudo mkdir /var/lib/tarmac && sudo chown ubuntu.ubuntu /var/lib/tarmac
+
 4. Set the user that tarmac will use on launchpad:
 
-        $ bzr launchpad-login <your-launchpad-login>. 
+        $ bzr launchpad-login <your-launchpad-login>.
 
 5. Tarmac needs to be able to access launchpad with its own ssh key, so generate
    an ssh key for the user:
@@ -25,10 +45,10 @@ Usage instructions
 
 6. As the tarmac-running user, or globally, do <code>bzr branch lp:some-project</code>, this is so that
    launchpad's ssh host keys are known to the user, otherwise an Invalid host key error will appear.
- 
+
 7. Edit configurations to suit your needs:
 
-    * Edit .config/tarmac and set branch_root to the location for your 
+    * Edit .config/tarmac and set branch_root to the location for your
       tarmac local branches.
     * Edit /etc/init/tarmac-lander.conf and set HOME, PYTHONPATH, TARMAC_DIR
       and TARMAC_CONFIG to the appropriate values.
@@ -38,7 +58,7 @@ Usage instructions
         $ cd ~/tarmac
         $ PYTHONPATH=. ./bin/tarmac authenticate
 
-Now you're ready to start running tarmac.  
+Now you're ready to start running tarmac.
 
 * To run once, do
 
@@ -87,3 +107,14 @@ this, to allow for some breathing room.
    the ramdisk:
 
         $ VBoxManage setproperty machinefolder /ramdisk/vms
+
+
+Running as a different (non-ubuntu) user
+========================================
+
+1. Modify step 3 to make `/var/lib/tarmac` owned by your non-ubuntu user.
+2. Edit `/etc/init/tarmac-lander.conf` and change `setuid ubuntu` to your user, and
+   all instances of  `/home/ubuntu` to your user's home directory.
+
+
+[2]: http://juju.ubuntu.com

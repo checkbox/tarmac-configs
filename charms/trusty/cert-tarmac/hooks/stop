@@ -1,0 +1,6 @@
+#!/bin/bash
+# Just remove the tarmac-lander cron entry and try to stop
+# any running instances.
+[ -f /etc/cron.d/tarmac-lander ] && rm /etc/cron.d/tarmac-lander || true
+
+stop tarmac-lander || true

@@ -1,0 +1,49 @@
+#!/bin/bash
+TUSER=ubuntu
+TUSERHOME=/home/${TUSER}
+
+# Install needed packages
+add-apt-repository multiverse
+set -e
+apt-get update
+
+apt-get install -y git bzr python-bzrlib lxc pastebinit apt-cacher-ng
+
+set +e
+# Let me handle errors here myself.
+# vbox may error out if we're deploying on lxc, let's just ignore this
+# and we can later detect if vagrant is working correctly.
+apt-get install -y vagrant virtualbox
+# Barf again if anything fails.
+set -e
+
+# Create and set up my user and directories
+if  ! id ${TUSER} ; then
+    useradd -m -d ${TUSERHOME} ${TUSER}
+fi
+
+mkdir -p ${TUSERHOME}/.config
+
+mkdir -p /var/lib/tarmac
+chown ${TUSER}:${TUSER} /var/lib/tarmac
+
+# Get tarmac and my configuration to deploy
+juju-log "Getting tarmac configs from github"
+[ -e ${TUSERHOME}/.config/tarmac ] && rm -rf ${TUSERHOME}/.config/tarmac || true
+git clone git://github.com/checkbox/tarmac-configs.git ${TUSERHOME}/.config/tarmac
+
+juju-log "Getting customized tarmac from github"
+[ -e ${TUSERHOME}/tarmac ] && rm -rf ${TUSERHOME}/tarmac || true
+git clone git://github.com/checkbox/tarmac.git ${TUSERHOME}/tarmac
+
+juju-log "Installing upstart config file for tarmac-lander"
+cp ${TUSERHOME}/.config/tarmac/tarmac-lander.conf /etc/init
+
+# Add sudo configuration for TUSER to be able to run lxc if needed
+juju-log "Configuring sudo for lxc for $TUSER"
+cat <<EOF >>/etc/sudoers
+Cmnd_Alias LXC_COMMANDS = /usr/bin/lxc-create, /usr/bin/lxc-start, \
+/usr/bin/lxc-destroy, /usr/bin/lxc-attach, /usr/bin/lxc-start-ephemeral, \
+/usr/bin/lxc-stop, /usr/bin/lxc-ls, /usr/bin/lxc-info, /usr/bin/lxc-wait
+$TUSER ALL=NOPASSWD: LXC_COMMANDS
+EOF
