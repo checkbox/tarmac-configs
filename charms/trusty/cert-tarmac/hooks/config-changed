@@ -35,4 +35,7 @@ if [ -n "$LAUNCHPAD_ID" ]; then
 	sudo -u ${TUSER} -- bzr launchpad-login $LAUNCHPAD_ID
 fi
 
-
+if [ ! -e /usr/share/debootstrap/scripts/utopic ]; then
+    juju-log "creating debootstrap utopic script"
+    ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/utopic
+fi
