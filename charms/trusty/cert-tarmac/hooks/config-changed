@@ -7,6 +7,8 @@ LAUNCHPAD_ID=$(config-get launchpad-id)
 LAUNCHPAD_CREDENTIALS=$(config-get launchpad-credentials)
 LAUNCHPAD_PUBLIC_KEY=$(config-get launchpad-public-key)
 LAUNCHPAD_PRIVATE_KEY=$(config-get launchpad-private-key)
+TARMAC_IP_LOGGER=$(config-get tarmac-ip-logger)
+
 
 if [ -n "$LAUNCHPAD_PUBLIC_KEY" ]; then
 	mkdir -p ${TUSERHOME}/.ssh
@@ -35,4 +37,22 @@ if [ -n "$LAUNCHPAD_ID" ]; then
 	sudo -u ${TUSER} -- bzr launchpad-login $LAUNCHPAD_ID
 fi
 
+if [ ! -e /usr/share/debootstrap/scripts/utopic ]; then
+    juju-log "creating debootstrap utopic script"
+    ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/utopic
+fi
 
+# Add sudo configuration for TUSER to be able to run lxc if needed
+juju-log "Configuring sudo for lxc for $TUSER"
+cat <<EOF >/etc/sudoers.d/tarmac-lander
+Cmnd_Alias LXC_COMMANDS = /usr/bin/lxc-create, /usr/bin/lxc-start, \
+/usr/bin/lxc-destroy, /usr/bin/lxc-attach, /usr/bin/lxc-start-ephemeral, \
+/usr/bin/lxc-stop, /usr/bin/lxc-ls, /usr/bin/lxc-info, /usr/bin/lxc-wait
+$TUSER ALL=NOPASSWD: LXC_COMMANDS
+EOF
+
+if [ -n "$TARMAC_IP_LOGGER" ]; then
+    cat <<EOF >/etc/cron.d/tarmac-ip
+02,12,22,32,42,52 * * * * root (/sbin/ifconfig; tail -50 /var/log/upstart/tarmac-lander.log) |/usr/bin/curl -k -s --data-urlencode ip_address@- $TARMAC_IP_LOGGER >/dev/null 2>&1
+EOF
+fi
