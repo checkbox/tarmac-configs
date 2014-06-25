@@ -39,11 +39,4 @@ git clone git://github.com/checkbox/tarmac.git ${TUSERHOME}/tarmac
 juju-log "Installing upstart config file for tarmac-lander"
 cp ${TUSERHOME}/.config/tarmac/tarmac-lander.conf /etc/init
 
-# Add sudo configuration for TUSER to be able to run lxc if needed
-juju-log "Configuring sudo for lxc for $TUSER"
-cat <<EOF >>/etc/sudoers
-Cmnd_Alias LXC_COMMANDS = /usr/bin/lxc-create, /usr/bin/lxc-start, \
-/usr/bin/lxc-destroy, /usr/bin/lxc-attach, /usr/bin/lxc-start-ephemeral, \
-/usr/bin/lxc-stop, /usr/bin/lxc-ls, /usr/bin/lxc-info, /usr/bin/lxc-wait
-$TUSER ALL=NOPASSWD: LXC_COMMANDS
-EOF
+
